@@ -25,6 +25,9 @@ class WPSDB_Base
   function __construct($plugin_file_path)
   {
     $this->settings = get_option('wpsdb_settings');
+    if ( ! is_array($this->settings)) {
+      $this->settings = [];
+    }
 
     $this->addons = [
       'wp-sync-db-media-files/wp-sync-db-media-files.php' => [

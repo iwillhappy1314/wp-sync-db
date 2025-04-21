@@ -1,5 +1,9 @@
 # WP Sync DB
 
+> [!NOTE]
+> This fork is lightly maintained, but I'm not actively developing it.
+> No new features are planned, but I'll fix deprecated code and exception from time to time.
+
 WP Sync DB eliminates the manual work of migrating a WP database. Copy your db from one WP install to another with a single-click in your dashboard. Especially handy for syncing a local development database with a live site.
 
 <p align="center"><img src="https://raw.github.com/slang800/psychic-ninja/master/wp-migrate-db.png"/></p>
@@ -44,14 +48,24 @@ WP Sync DB checks both the remote and local servers to determine limitations and
 
 ### Sync Media Libraries Between Installations
 
-Using the optional [WP Sync DB Media Files](https://github.com/wp-sync-db/wp-sync-db-media-files) addon, you can have media files synced between installs too.
+Using the optional [WP Sync DB Media Files](https://github.com/jsongerber/wp-sync-db-media-files) addon, you can have media files synced between installs too.
 
 ## Installation
 
-1. Install [github-updater](https://github.com/afragen/github-updater) by downloading the latest zip [here](https://github.com/afragen/github-updater/releases). We rely on this plugin for updating WP Sync DB directly from this git repo.
-2. Install WP Sync DB by downloading the latest zip [here](https://github.com/wp-sync-db/wp-sync-db/releases). Both github-updater and WP Sync DB will now download their own updates automatically, so you will never need to go through that tedious zip downloading again.
+### Using composer
+
+If you manage your WordPress site using composer (e.g. with [Bedrock](https://roots.io/bedrock/)), you can install WP Sync DB using the following command:
+
+```bash
+composer require jsongerber/wp-sync-db
+```
+
+### Using git-updater
+
+1. Install [git-updater](https://github.com/afragen/git-updater) by downloading the latest zip [here](https://github.com/afragen/git-updater/releases). We rely on this plugin for updating WP Sync DB directly from this git repo.
+2. Install WP Sync DB by downloading the latest zip [here](https://github.com/jsongerber/wp-sync-db/releases). Both github-updater and WP Sync DB will now download their own updates automatically, so you will never need to go through that tedious zip downloading again.
 3. Access the WP Sync DB menu option under Tools.
-4. Install the optional [WP Sync DB Media Files](https://github.com/wp-sync-db/wp-sync-db-media-files) addon.
+4. Install the optional [WP Sync DB Media Files](https://github.com/jsongerber/wp-sync-db-media-files/releases) addon.
 
 ## Help Videos
 
@@ -77,11 +91,11 @@ This screencast demonstrates how you can push a local WordPress database you've 
 
 <http://www.youtube.com/watch?v=0aR8-jC2XXM>
 
-A short demo of how the [Media Files addon](https://github.com/wp-sync-db/wp-sync-db-media-files) allows you to sync up your WordPress Media Libraries.
+A short demo of how the [Media Files addon](https://github.com/jsongerber/wp-sync-db-media-files) allows you to sync up your WordPress Media Libraries.
 
 ## Similar Tools
 
-- [Interconnect IT's Search & Replace](https://github.com/interconnectit/Search-Replace-DB)
+-   [Interconnect IT's Search & Replace](https://github.com/interconnectit/Search-Replace-DB)
 
 ## Isn't this the same as WP Migrate DB Pro?
 

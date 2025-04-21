@@ -20,7 +20,6 @@ class WPSDB extends WPSDB_Base
   protected $alter_table_name;
   protected $session_salt;
   protected $primary_keys;
-
   protected $checkbox_options;
 
   function __construct($plugin_file_path)
@@ -474,7 +473,6 @@ class WPSDB extends WPSDB_Base
     echo 'OpenSSL: ';
     if ($this->open_ssl_enabled()) {
       echo OPENSSL_VERSION_TEXT;
-
     } else {
       echo 'Disabled';
     }
@@ -1046,7 +1044,6 @@ class WPSDB extends WPSDB_Base
         $return[ 'dump_filename' ] = substr($return[ 'dump_filename' ], 0, -4);
         $return[ 'dump_url' ]      = $this->get_sql_dump_info('backup', 'url');
       }
-
     }
 
     $return[ 'dump_filename' ] = (empty($return[ 'dump_filename' ])) ? '' : $return[ 'dump_filename' ];
@@ -1319,7 +1316,8 @@ class WPSDB extends WPSDB_Base
       $post_types = $wpdb->get_results(
         "SELECT DISTINCT `post_type`
 				FROM `{$wpdb->prefix}posts`
-				WHERE 1;", ARRAY_A
+				WHERE 1;",
+        ARRAY_A
       );
     }
 
@@ -1345,15 +1343,16 @@ class WPSDB extends WPSDB_Base
   function get_table_row_count()
   {
     global $wpdb;
-    $results = $wpdb->get_results($wpdb->prepare(
-      'SELECT table_name, TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s', DB_NAME
-    ), ARRAY_A
+    $results = $wpdb->get_results(
+      $wpdb->prepare(
+        'SELECT TABLE_NAME, TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s',
+        DB_NAME
+      ),
+      ARRAY_A
     );
     $return  = [];
     foreach ($results as $results) {
-      if (isset($results[ 'table_name' ])) {
-        $return[ $results[ 'table_name' ] ] = ($results[ 'TABLE_ROWS' ] == 0 ? 1 : $results[ 'TABLE_ROWS' ]);
-      }
+      $return[ $results[ 'TABLE_NAME' ] ] = ($results[ 'TABLE_ROWS' ] == 0 ? 1 : (int)$results[ 'TABLE_ROWS' ]);
     }
 
     return $return;
@@ -1363,13 +1362,17 @@ class WPSDB extends WPSDB_Base
   {
     global $wpdb;
     $prefix  = ($scope == 'temp' ? $this->temp_prefix : $wpdb->prefix);
-    $results = $wpdb->get_results($wpdb->prepare(
-      'SELECT TABLE_NAME AS "table",
+    $results = $wpdb->get_results(
+      $wpdb->prepare(
+        'SELECT TABLE_NAME AS "table",
 							ROUND((data_length + index_length)/1024,0) AS "size"
 							FROM information_schema.TABLES
 							WHERE information_schema.TABLES.table_schema="%s"
-							AND information_schema.TABLES.table_type="%s"', DB_NAME, "BASE TABLE"
-    ), ARRAY_A
+							AND information_schema.TABLES.table_type="%s"',
+        DB_NAME,
+        "BASE TABLE"
+      ),
+      ARRAY_A
     );
 
     $return = [];
@@ -1383,20 +1386,19 @@ class WPSDB extends WPSDB_Base
 
   function get_post_max_size()
   {
-    $val   = trim(ini_get('post_max_size'));
-    $last  = strtolower($val[ strlen($val) - 1 ]);
-    $value = rtrim($val, $val[ strlen($val) - 1 ]);
-
+    $val  = trim(ini_get('post_max_size'));
+    $last = strtolower($val[ strlen($val) - 1 ]);
+    $val  = (int)$val;
     switch ($last) {
       case 'g':
-        $value *= 1024;
+        $val *= 1024;
       case 'm':
-        $value *= 1024;
+        $val *= 1024;
       case 'k':
-        $value *= 1024;
+        $val *= 1024;
     }
 
-    return $value;
+    return $val;
   }
 
   function get_sensible_pull_limit()
@@ -1502,7 +1504,7 @@ class WPSDB extends WPSDB_Base
 
       <?php
       $hide_warning = apply_filters('wpsdb_hide_set_time_limit_warning', false);
-      if (false == $this->set_time_limit_available() && ! $hide_warning) {
+      if (false == $this->set_time_limit_available() && ! $hide_warning && ( ! function_exists('ini_get') || ! ini_get('safe_mode'))) {
         ?>
         <div class="updated warning inline-message">
           <?php
@@ -1771,7 +1773,8 @@ class WPSDB extends WPSDB_Base
           (0 === strpos(strtolower($struct->Type), 'smallint')) ||
           (0 === strpos(strtolower($struct->Type), 'mediumint')) ||
           (0 === strpos(strtolower($struct->Type), 'int')) ||
-          (0 === strpos(strtolower($struct->Type), 'bigint'))) {
+          (0 === strpos(strtolower($struct->Type), 'bigint'))
+      ) {
         $defs[ strtolower($struct->Field) ] = (null === $struct->Default) ? 'NULL' : $struct->Default;
         $ints[ strtolower($struct->Field) ] = "1";
       }
@@ -2031,7 +2034,6 @@ class WPSDB extends WPSDB_Base
           $insert_buffer = $insert_query_template;
           $query_size    = 0;
         }
-
       }
     } while (count($table_data) > 0);
 
@@ -2058,7 +2060,6 @@ class WPSDB extends WPSDB_Base
     $this->row_tracker = -1;
 
     return $this->transfer_chunk();
-
   } // end backup_table()
 
   function table_is($desired_table, $given_table)
@@ -2165,9 +2166,7 @@ class WPSDB extends WPSDB_Base
       if ($is_json) {
         return json_encode($data);
       }
-
     } catch (Exception $error) {
-
     }
 
     return $data;
@@ -2455,7 +2454,6 @@ class WPSDB extends WPSDB_Base
     wp_enqueue_script('jquery-ui-core');
     wp_enqueue_script('jquery-ui-slider');
     wp_enqueue_script('jquery-ui-sortable');
-
   }
 
   function download_file()
@@ -2509,27 +2507,27 @@ class WPSDB extends WPSDB_Base
     ?>
     <script type='text/javascript'>
       var wpsdb_connection_info = <?php echo json_encode([site_url('', 'https'), $this->settings[ 'key' ]]); ?>;
-      var wpsdb_this_url = '<?php echo addslashes(home_url()) ?>';
-      var wpsdb_this_path = '<?php echo addslashes($this->absolute_root_file_path); ?>';
-      var wpsdb_this_domain = '<?php echo $this->get_domain_current_site(); ?>';
+      var wpsdb_this_url = '<?php echo addslashes(home_url()) ?>'
+      var wpsdb_this_path = '<?php echo addslashes($this->absolute_root_file_path); ?>'
+      var wpsdb_this_domain = '<?php echo $this->get_domain_current_site(); ?>'
       var wpsdb_this_tables = <?php echo json_encode($this->get_tables()); ?>;
       var wpsdb_this_prefixed_tables = <?php echo json_encode($this->get_tables('prefix')); ?>;
       var wpsdb_this_table_sizes = <?php echo json_encode($this->get_table_sizes()); ?>;
       var wpsdb_this_table_rows = <?php echo json_encode($this->get_table_row_count()); ?>;
-      var wpsdb_this_upload_url = '<?php echo addslashes(trailingslashit($this->get_upload_info('url'))); ?>';
-      var wpsdb_this_upload_dir_long = '<?php echo addslashes(trailingslashit($this->get_upload_info('path'))); ?>';
-      var wpsdb_this_website_name = '<?php echo sanitize_title_with_dashes(DB_NAME); ?>';
-      var wpsdb_this_download_url = '<?php echo network_admin_url($this->plugin_base . '&download='); ?>';
-      var wpsdb_this_prefix = '<?php echo $table_prefix; ?>';
+      var wpsdb_this_upload_url = '<?php echo addslashes(trailingslashit($this->get_upload_info('url'))); ?>'
+      var wpsdb_this_upload_dir_long = '<?php echo addslashes(trailingslashit($this->get_upload_info('path'))); ?>'
+      var wpsdb_this_website_name = '<?php echo sanitize_title_with_dashes(DB_NAME); ?>'
+      var wpsdb_this_download_url = '<?php echo network_admin_url($this->plugin_base . '&download='); ?>'
+      var wpsdb_this_prefix = '<?php echo $table_prefix; ?>'
       var wpsdb_is_multisite = <?php echo(is_multisite() ? 'true' : 'false'); ?>;
       var wpsdb_openssl_available = <?php echo($this->open_ssl_enabled() ? 'true' : 'false'); ?>;
-      var wpsdb_plugin_version = '<?php echo $this->plugin_version; ?>';
-      var wpsdb_max_request = '<?php echo $this->settings[ 'max_request' ] ?>';
-      var wpsdb_bottleneck = '<?php echo $this->get_bottleneck('max'); ?>';
-      var wpsdb_this_uploads_dir = '<?php echo addslashes($this->get_short_uploads_dir()); ?>';
+      var wpsdb_plugin_version = '<?php echo $this->plugin_version; ?>'
+      var wpsdb_max_request = '<?php echo $this->settings[ 'max_request' ] ?>'
+      var wpsdb_bottleneck = '<?php echo $this->get_bottleneck('max'); ?>'
+      var wpsdb_this_uploads_dir = '<?php echo addslashes($this->get_short_uploads_dir()); ?>'
       var wpsdb_write_permission = <?php echo(is_writeable($this->get_upload_info('path')) ? 'true' : 'false'); ?>;
       var wpsdb_nonces = <?php echo json_encode($nonces); ?>;
-      var wpsdb_profile = '<?php echo(isset($_GET[ 'wpsdb-profile' ]) ? $_GET[ 'wpsdb-profile' ] : '-1'); ?>';
+      var wpsdb_profile = '<?php echo(isset($_GET[ 'wpsdb-profile' ]) ? $_GET[ 'wpsdb-profile' ] : '-1'); ?>'
       <?php do_action('wpsdb_js_variables'); ?>
     </script>
     <?php
@@ -2598,6 +2596,7 @@ class WPSDB extends WPSDB_Base
     }
     $val  = trim($val);
     $last = strtolower($val[ strlen($val) - 1 ]);
+    $val  = (int)$val;
     switch ($last) {
       // The 'G' modifier is available since PHP 5.1.0
       case 'g':
@@ -2607,7 +2606,7 @@ class WPSDB extends WPSDB_Base
       case 'k':
         $val *= 1024;
         break;
-      default :
+      default:
         $val = false;
         break;
     }
@@ -2625,11 +2624,11 @@ class WPSDB extends WPSDB_Base
     $this->form_data = $this->parse_migration_form_data($_POST[ 'form_data' ]);
 
     switch ($_POST[ 'intent' ]) {
-      case 'savefile' :
+      case 'savefile':
         $this->delete_export_file($_POST[ 'dump_filename' ], false);
         break;
 
-      case 'push' :
+      case 'push':
         $data                  = $_POST;
         $data[ 'action' ]      = 'wpsdb_process_push_migration_cancellation';
         $data[ 'temp_prefix' ] = $this->temp_prefix;
@@ -2642,7 +2641,7 @@ class WPSDB extends WPSDB_Base
         echo trim($response);
         break;
 
-      case 'pull' :
+      case 'pull':
         if ($_POST[ 'stage' ] == 'backup') {
           $this->delete_export_file($_POST[ 'dump_filename' ], true);
         } else {
@@ -2711,5 +2710,4 @@ class WPSDB extends WPSDB_Base
   {
     $this->current_chunk = '';
   }
-
 }
